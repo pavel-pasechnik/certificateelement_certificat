@@ -73,8 +73,14 @@ class element extends \tool_certificate\element {
 
         $draftid = $data->image ?? 0;
         $context = $this->get_template()->get_context();
-        file_save_draft_area_files($draftid, $context->id, 'tool_certificate', 'element', $this->get_id(),
-            $this->filemanageroptions);
+        file_save_draft_area_files(
+            $draftid,
+            $context->id,
+            'tool_certificate',
+            'element',
+            $this->get_id(),
+            $this->filemanageroptions
+        );
     }
 
     /**
@@ -152,8 +158,14 @@ class element extends \tool_certificate\element {
         if ($this->get_id()) {
             $draftitemid = file_get_submitted_draft_itemid('image');
             $context = $this->get_template()->get_context();
-            file_prepare_draft_area($draftitemid, $context->id, 'tool_certificate', 'element', $this->get_id(),
-                $this->filemanageroptions);
+            file_prepare_draft_area(
+                $draftitemid,
+                $context->id,
+                'tool_certificate',
+                'element',
+                $this->get_id(),
+                $this->filemanageroptions
+            );
             $record->image = $draftitemid;
         } else {
             $record->image = null;
