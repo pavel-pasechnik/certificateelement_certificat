@@ -1,0 +1,7 @@
+<XMLDB PATH="admin/tool/certificate/element/certificat/db"
+       VERSION="2025111500"
+       COMMENT="Certificat element has no own tables">
+
+    <TABLES>
+    </TABLES>
+</XMLDB>
