@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 // Plugin metadata.
 $plugin->component   = 'certificateelement_certificat';
-$plugin->release      = '1.0.0';
+$plugin->release      = '1.0.1';
 $plugin->version      = 2025111500; // Matches local_certificateimport schema.
 $plugin->requires     = 2024041900.00; // Moodle 4.5 (Workplace).
 $plugin->maturity     = MATURITY_STABLE;
