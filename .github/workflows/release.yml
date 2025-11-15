@@ -41,13 +41,12 @@ jobs:
             echo "VERSION_NUMBER=$VERSION_NUMBER"
           } >> "$GITHUB_ENV"
 
-      - name: Update version numbers in version.php and install.xml
+      - name: Update version numbers in version.php
         run: |
-          echo "🔧 Updating version.php and install.xml to version $VERSION_NUMBER ($RELEASE)"
+          echo "🔧 Updating version.php to version $VERSION_NUMBER ($RELEASE)"
 
           sed -i "s/\(\$plugin->version *= *\)[0-9]*/\1$VERSION_NUMBER/" version.php
           sed -i "s/\(\$plugin->release *= *'\)[^']*/\1$RELEASE/" version.php
-          sed -i "s/VERSION=\"[0-9]*\"/VERSION=\"$VERSION_NUMBER\"/" db/install.xml
 
       - name: Commit version bump
         env:
@@ -58,7 +57,7 @@ jobs:
           else
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add version.php db/install.xml
+            git add version.php
             git commit -m "chore: release $VERSION"
             git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}" HEAD:${{ github.ref_name }}
           fi
