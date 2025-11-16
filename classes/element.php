@@ -27,40 +27,6 @@ use tool_certificate\element_helper;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class element extends \tool_certificate\element {
-    /** @var array File manager options for fallback image uploads. */
-    protected $filemanageroptions = [];
-
-    /**
-     * Constructor.
-     */
-    protected function __construct() {
-        global $COURSE;
-
-        $this->filemanageroptions = [
-            'maxbytes' => $COURSE->maxbytes ?? 0,
-            'subdirs' => 0,
-            'accepted_types' => 'web_image',
-            'maxfiles' => 1,
-        ];
-
-        parent::__construct();
-    }
-    /**
-     * Inject the common typography and positioning controls.
-     *
-     * @param \MoodleQuickForm $mform
-     */
-    public function render_form_elements($mform) {
-        parent::render_form_elements($mform);
-
-        $mform->addElement(
-            'filemanager',
-            'image',
-            get_string('uploadimage', 'tool_certificate'),
-            '',
-            $this->filemanageroptions
-        );
-    }
 
     /**
      * Persist configuration.
@@ -70,17 +36,6 @@ class element extends \tool_certificate\element {
     public function save_form_data(\stdClass $data) {
         $data->data = $this->build_configuration_payload($data);
         parent::save_form_data($data);
-
-        $draftid = $data->image ?? 0;
-        $context = $this->get_template()->get_context();
-        file_save_draft_area_files(
-            $draftid,
-            $context->id,
-            'tool_certificate',
-            'element',
-            $this->get_id(),
-            $this->filemanageroptions
-        );
     }
 
     /**
@@ -96,10 +51,6 @@ class element extends \tool_certificate\element {
             $file = $this->resolve_preview_file();
         } else {
             $file = $this->resolve_issue_file($issue);
-        }
-
-        if (!$file) {
-            $file = $this->get_fallback_file();
         }
 
         if (!$file instanceof stored_file) {
@@ -121,13 +72,9 @@ class element extends \tool_certificate\element {
         $hasimports = true;
         $file = $this->resolve_preview_file($hasimports);
 
-        if (!$file) {
-            if ($hasimports) {
-                $file = $this->get_fallback_file();
-            } else {
-                $message = get_string('message:noimports', 'certificateelement_certificat');
-                return element_helper::render_html_content($this, $message);
-            }
+        if (!$file && !$hasimports) {
+            $message = get_string('message:noimports', 'certificateelement_certificat');
+            return element_helper::render_html_content($this, $message);
         }
 
         if ($file instanceof stored_file) {
@@ -145,33 +92,6 @@ class element extends \tool_certificate\element {
 
         $message = get_string('message:preview', 'certificateelement_certificat');
         return element_helper::render_html_content($this, $message);
-    }
-
-    /**
-     * Helper to prepare data for the form.
-     *
-     * @return \stdClass|array
-     */
-    public function prepare_data_for_form() {
-        $record = parent::prepare_data_for_form();
-
-        if ($this->get_id()) {
-            $draftitemid = file_get_submitted_draft_itemid('image');
-            $context = $this->get_template()->get_context();
-            file_prepare_draft_area(
-                $draftitemid,
-                $context->id,
-                'tool_certificate',
-                'element',
-                $this->get_id(),
-                $this->filemanageroptions
-            );
-            $record->image = $draftitemid;
-        } else {
-            $record->image = null;
-        }
-
-        return $record;
     }
 
     /**
@@ -338,33 +258,6 @@ class element extends \tool_certificate\element {
 
         $record = reset($records);
         return $this->get_file_by_id((int)$record->backgroundfileid);
-    }
-
-    /**
-     * Returns the fallback image configured directly in the element.
-     *
-     * @return stored_file|null
-     */
-    protected function get_fallback_file(): ?stored_file {
-        if (!$this->get_id()) {
-            return null;
-        }
-
-        $context = $this->get_template()->get_context();
-        $files = get_file_storage()->get_area_files(
-            $context->id,
-            'tool_certificate',
-            'element',
-            $this->get_id(),
-            '',
-            false
-        );
-
-        if (!$files) {
-            return null;
-        }
-
-        return reset($files);
     }
 
     /**
