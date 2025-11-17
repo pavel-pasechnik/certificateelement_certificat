@@ -27,7 +27,6 @@ use tool_certificate\element_helper;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class element extends \tool_certificate\element {
-
     /**
      * Persist configuration.
      *
